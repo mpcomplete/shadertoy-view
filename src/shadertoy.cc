@@ -30,8 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <GLUT/glut.h>
 #endif
 
-#include <imago2.h>
-
 struct Texture {
 	unsigned int id;
 	unsigned int targ;
@@ -110,31 +108,31 @@ int main(int argc, char **argv)
 
 	glewInit();
 
-	int dataidx = 0;
+//	int dataidx = 0;
 
-	LOADTEX("data/tex00.jpg");
-	LOADTEX("data/tex01.jpg");
-	LOADTEX("data/tex02.jpg");
-	LOADTEX("data/tex03.jpg");
-	LOADTEX("data/tex04.jpg");
-	LOADTEX("data/tex05.jpg");
-	LOADTEX("data/tex06.jpg");
-	LOADTEX("data/tex07.jpg");
-	LOADTEX("data/tex08.jpg");
-	LOADTEX("data/tex09.jpg");
-	LOADTEX("data/tex10.png");
-	LOADTEX("data/tex11.png");
-	LOADTEX("data/tex12.png");
-	LOADTEX("data/tex14.png");
-	assert(glGetError() == GL_NO_ERROR);
-
-	LOADCUBE("data/cube00_%d.jpg");
-	LOADCUBE("data/cube01_%d.png");
-	LOADCUBE("data/cube02_%d.jpg");
-	LOADCUBE("data/cube03_%d.png");
-	LOADCUBE("data/cube04_%d.png");
-	LOADCUBE("data/cube05_%d.png");
-
+//	LOADTEX("data/tex00.jpg");
+//	LOADTEX("data/tex01.jpg");
+//	LOADTEX("data/tex02.jpg");
+//	LOADTEX("data/tex03.jpg");
+//	LOADTEX("data/tex04.jpg");
+//	LOADTEX("data/tex05.jpg");
+//	LOADTEX("data/tex06.jpg");
+//	LOADTEX("data/tex07.jpg");
+//	LOADTEX("data/tex08.jpg");
+//	LOADTEX("data/tex09.jpg");
+//	LOADTEX("data/tex10.png");
+//	LOADTEX("data/tex11.png");
+//	LOADTEX("data/tex12.png");
+//	LOADTEX("data/tex14.png");
+//	assert(glGetError() == GL_NO_ERROR);
+//
+//	LOADCUBE("data/cube00_%d.jpg");
+//	LOADCUBE("data/cube01_%d.png");
+//	LOADCUBE("data/cube02_%d.jpg");
+//	LOADCUBE("data/cube03_%d.png");
+//	LOADCUBE("data/cube04_%d.png");
+//	LOADCUBE("data/cube05_%d.png");
+//
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
@@ -321,7 +319,7 @@ unsigned int load_shader(const char *fname)
 		delete [] buf;
 	}
 	if(!status) {
-		fprintf(stderr, "failed\n");
+		fprintf(stderr, "status failed\n");
 		glDeleteShader(sdr);
 		glDeleteProgram(prog);
 		return 0;
@@ -382,7 +380,8 @@ bool load_shader_metadata(const char *sdrname)
 Texture *load_texture(const char *fname)
 {
 	Texture *tex = new Texture;
-	tex->id = img_gltexture_load(fname);
+        tex->id = 0;
+//	tex->id = img_gltexture_load(fname);
 	if(!tex->id) {
 		fprintf(stderr, "failed to load texture: %s\n", fname);
 		return 0;
@@ -394,6 +393,8 @@ Texture *load_texture(const char *fname)
 
 Texture *load_cubemap(const char *fname_fmt)
 {
+  return 0;
+#if 0
 	char *fname = new char[strlen(fname_fmt) + 1];
 
 	Texture *tex = new Texture;
@@ -442,6 +443,7 @@ Texture *load_cubemap(const char *fname_fmt)
 	}
 
 	return tex;
+#endif
 }
 
 bool parse_args(int argc, char **argv)

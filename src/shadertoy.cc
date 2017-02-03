@@ -23,6 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>
 #include <assert.h>
 #include <GL/glew.h>
+#include <iostream>
+
+#include "../lodepng/lodepng.h"
 
 #ifndef __APPLE__
 #include <GL/glut.h>
@@ -48,6 +51,8 @@ bool load_shader_metadata(const char *sdrname);
 //Texture *load_texture(const char *fname);
 //Texture *load_cubemap(const char *fname_fmt);
 bool parse_args(int argc, char **argv);
+void create_texture();
+void draw_to_texture();
 
 unsigned int sdr;
 static struct {
@@ -136,6 +141,8 @@ int main(int argc, char **argv)
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
+        // create_texture();
+
 	load_shader_metadata(sdrfname_arg);
 
 	// override with -t arguments
@@ -210,6 +217,14 @@ void keyb(unsigned char key, int x, int y)
 	switch(key) {
 	case 27:
 		exit(0);
+
+        // case 'i':
+        //         create_texture();
+        //         break;
+
+        // case 's':
+        //         draw_to_texture();
+        //         break;
 
 	case 'f':
 	case 'F':
@@ -477,4 +492,85 @@ bool parse_args(int argc, char **argv)
 		}
 	}
 	return true;
+}
+
+static GLubyte *capture_pixels = NULL;
+static GLuint framebuffer = 0;
+static const GLuint CAPTURE_WIDTH = 3840;
+static const GLuint CAPTURE_HEIGHT = 2160;
+static const GLenum CAPTURE_FORMAT = GL_RGBA;
+static const GLuint CAPTURE_FORMAT_NBYTES = 4;
+
+static void save_image() {
+  static unsigned int nscreenshots = 0;
+  char filename[256];
+  snprintf(filename, sizeof(filename), "screenshot%d.png", nscreenshots++);
+
+  std::cout << "Capturing " << filename << "..." << std::flush;
+  std::vector<unsigned char> image_buf;
+  lodepng::encode(image_buf, capture_pixels, CAPTURE_WIDTH, CAPTURE_HEIGHT);
+  lodepng::save_file(image_buf, filename);
+  std::cout << "done" << std::endl;
+}
+
+void create_texture()
+{
+  // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
+  glGenFramebuffers(1, &framebuffer);
+  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+  // The texture we're going to render to
+  GLuint renderedTexture;
+  glGenTextures(1, &renderedTexture);
+
+  // "Bind" the newly created texture : all future texture functions will modify this texture
+  glBindTexture(GL_TEXTURE_2D, renderedTexture);
+
+  // Give an empty image to OpenGL ( the last "0" )
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CAPTURE_WIDTH, CAPTURE_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+  // Poor filtering. Needed !
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+  // The depth buffer
+  GLuint depthrenderbuffer;
+  glGenRenderbuffers(1, &depthrenderbuffer);
+  glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, CAPTURE_WIDTH, CAPTURE_HEIGHT);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
+
+  // Set "renderedTexture" as our colour attachement #0
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0);
+
+  // Set the list of draw buffers.
+  GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+  glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+
+  // Always check that our framebuffer is ok
+  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    return;
+
+  capture_pixels = (GLubyte*)malloc(CAPTURE_FORMAT_NBYTES * CAPTURE_WIDTH * CAPTURE_HEIGHT);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void draw_to_texture()
+{
+        int orig_width = win_width, orig_height = win_height;
+  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+  glViewport(0, 0, CAPTURE_WIDTH, CAPTURE_HEIGHT);
+  reshape(CAPTURE_WIDTH, CAPTURE_HEIGHT);
+
+  disp();
+
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glReadBuffer(GL_FRONT);
+  glReadPixels(0, 0, CAPTURE_WIDTH, CAPTURE_HEIGHT, CAPTURE_FORMAT, GL_UNSIGNED_BYTE, capture_pixels);
+
+  save_image();
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  reshape(orig_width, orig_height);
 }

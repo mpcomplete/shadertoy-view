@@ -1,5 +1,5 @@
 src = $(wildcard src/*.cc)
-obj = $(src:.cc=.o)
+obj = $(src:.cc=.o) lodepng/lodepng.o
 dep = $(obj:.o=.d)
 bin = shadertoy
 

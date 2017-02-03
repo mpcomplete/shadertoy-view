@@ -45,8 +45,8 @@ void mouse(int bn, int state, int x, int y);
 void motion(int x, int y);
 unsigned int load_shader(const char *fname);
 bool load_shader_metadata(const char *sdrname);
-Texture *load_texture(const char *fname);
-Texture *load_cubemap(const char *fname_fmt);
+//Texture *load_texture(const char *fname);
+//Texture *load_cubemap(const char *fname_fmt);
 bool parse_args(int argc, char **argv);
 
 unsigned int sdr;
@@ -107,32 +107,32 @@ int main(int argc, char **argv)
 	glutMotionFunc(motion);
 
 	glewInit();
+#if 0
+	int dataidx = 0;
 
-//	int dataidx = 0;
+	LOADTEX("data/tex00.jpg");
+	LOADTEX("data/tex01.jpg");
+	LOADTEX("data/tex02.jpg");
+	LOADTEX("data/tex03.jpg");
+	LOADTEX("data/tex04.jpg");
+	LOADTEX("data/tex05.jpg");
+	LOADTEX("data/tex06.jpg");
+	LOADTEX("data/tex07.jpg");
+	LOADTEX("data/tex08.jpg");
+	LOADTEX("data/tex09.jpg");
+	LOADTEX("data/tex10.png");
+	LOADTEX("data/tex11.png");
+	LOADTEX("data/tex12.png");
+	LOADTEX("data/tex14.png");
+	assert(glGetError() == GL_NO_ERROR);
 
-//	LOADTEX("data/tex00.jpg");
-//	LOADTEX("data/tex01.jpg");
-//	LOADTEX("data/tex02.jpg");
-//	LOADTEX("data/tex03.jpg");
-//	LOADTEX("data/tex04.jpg");
-//	LOADTEX("data/tex05.jpg");
-//	LOADTEX("data/tex06.jpg");
-//	LOADTEX("data/tex07.jpg");
-//	LOADTEX("data/tex08.jpg");
-//	LOADTEX("data/tex09.jpg");
-//	LOADTEX("data/tex10.png");
-//	LOADTEX("data/tex11.png");
-//	LOADTEX("data/tex12.png");
-//	LOADTEX("data/tex14.png");
-//	assert(glGetError() == GL_NO_ERROR);
-//
-//	LOADCUBE("data/cube00_%d.jpg");
-//	LOADCUBE("data/cube01_%d.png");
-//	LOADCUBE("data/cube02_%d.jpg");
-//	LOADCUBE("data/cube03_%d.png");
-//	LOADCUBE("data/cube04_%d.png");
-//	LOADCUBE("data/cube05_%d.png");
-//
+	LOADCUBE("data/cube00_%d.jpg");
+	LOADCUBE("data/cube01_%d.png");
+	LOADCUBE("data/cube02_%d.jpg");
+	LOADCUBE("data/cube03_%d.png");
+	LOADCUBE("data/cube04_%d.png");
+	LOADCUBE("data/cube05_%d.png");
+#endif
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
@@ -377,11 +377,11 @@ bool load_shader_metadata(const char *sdrname)
 	return true;
 }
 
+#if 0
 Texture *load_texture(const char *fname)
 {
 	Texture *tex = new Texture;
-        tex->id = 0;
-//	tex->id = img_gltexture_load(fname);
+	tex->id = img_gltexture_load(fname);
 	if(!tex->id) {
 		fprintf(stderr, "failed to load texture: %s\n", fname);
 		return 0;
@@ -393,8 +393,6 @@ Texture *load_texture(const char *fname)
 
 Texture *load_cubemap(const char *fname_fmt)
 {
-  return 0;
-#if 0
 	char *fname = new char[strlen(fname_fmt) + 1];
 
 	Texture *tex = new Texture;
@@ -443,8 +441,8 @@ Texture *load_cubemap(const char *fname_fmt)
 	}
 
 	return tex;
-#endif
 }
+#endif
 
 bool parse_args(int argc, char **argv)
 {

@@ -166,9 +166,9 @@ void disp()
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	assert(glGetError() == GL_NO_ERROR);
+	// assert(glGetError() == GL_NO_ERROR);
 	glUseProgram(sdr);
-	assert(glGetError() == GL_NO_ERROR);
+	// assert(glGetError() == GL_NO_ERROR);
 
 	// set uniforms
 	glUniform2f(uloc.resolution, win_width, win_height);
@@ -176,7 +176,7 @@ void disp()
 	glUniform4f(uloc.mouse, mouse_x, mouse_y, click_x, click_y);
 	glUniform4f(uloc.date, tm->tm_year, tm->tm_mon, tm->tm_mday,
 			tm->tm_sec + tm->tm_min * 60 + tm->tm_hour * 3600);
-	assert(glGetError() == GL_NO_ERROR);
+	// assert(glGetError() == GL_NO_ERROR);
 
 	int tunit = 0;
 	for(int i=0; i<4; i++) {
@@ -187,7 +187,7 @@ void disp()
 			tunit++;
 		}
 	}
-	assert(glGetError() == GL_NO_ERROR);
+	// assert(glGetError() == GL_NO_ERROR);
 
 	glBegin(GL_QUADS);
 	glVertex2f(-1, -1);
@@ -197,7 +197,7 @@ void disp()
 	glEnd();
 
 	glutSwapBuffers();
-	assert(glGetError() == GL_NO_ERROR);
+	// assert(glGetError() == GL_NO_ERROR);
 }
 
 void idle()
@@ -218,13 +218,13 @@ void keyb(unsigned char key, int x, int y)
 	case 27:
 		exit(0);
 
-        // case 'i':
-        //         create_texture();
-        //         break;
+        case 'i':
+                create_texture();
+                break;
 
-        // case 's':
-        //         draw_to_texture();
-        //         break;
+        case 's':
+                draw_to_texture();
+                break;
 
 	case 'f':
 	case 'F':
@@ -506,11 +506,11 @@ static void save_image() {
   char filename[256];
   snprintf(filename, sizeof(filename), "screenshot%d.png", nscreenshots++);
 
-  std::cout << "Capturing " << filename << "..." << std::flush;
+//   std::cout << "Capturing " << filename << "..." << std::flush;
   std::vector<unsigned char> image_buf;
   lodepng::encode(image_buf, capture_pixels, CAPTURE_WIDTH, CAPTURE_HEIGHT);
   lodepng::save_file(image_buf, filename);
-  std::cout << "done" << std::endl;
+//   std::cout << "done" << std::endl;
 }
 
 void create_texture()

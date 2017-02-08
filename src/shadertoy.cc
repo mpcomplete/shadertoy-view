@@ -24,7 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <GL/glew.h>
 #include <iostream>
-#include <sys/time.h>
 
 #include "../lodepng/lodepng.h"
 
@@ -176,12 +175,11 @@ void disp()
 	clock_gettime(CLOCK_REALTIME, &clk);
 	static struct timespec last_clk = clk;
 	static double elapsed_sec = 0.0;
-	elapsed_sec += 0.015;
-		// (clk.tv_nsec - last_clk.tv_nsec) / 1000.0 / 1000.0 / 1000.0 +
-		// clk.tv_sec - last_clk.tv_sec;
+	// elapsed_sec += 0.015;
+	elapsed_sec +=
+		(clk.tv_nsec - last_clk.tv_nsec) / 1000.0 / 1000.0 / 1000.0 +
+		clk.tv_sec - last_clk.tv_sec;
 	last_clk = clk;
-	// struct timeval tv;
-	// gettimeofday(&tv, NULL);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 

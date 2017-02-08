@@ -167,6 +167,9 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+double elapsed_sec = 0.0;
+bool paused = false;
+
 void disp()
 {
 	time_t tmsec = time(0);
@@ -174,12 +177,14 @@ void disp()
 	struct timespec clk;
 	clock_gettime(CLOCK_REALTIME, &clk);
 	static struct timespec last_clk = clk;
-	static double elapsed_sec = 0.0;
 	// elapsed_sec += 0.015;
-	elapsed_sec +=
-		(clk.tv_nsec - last_clk.tv_nsec) / 1000.0 / 1000.0 / 1000.0 +
-		clk.tv_sec - last_clk.tv_sec;
+	if (!paused) {
+		elapsed_sec +=
+			(clk.tv_nsec - last_clk.tv_nsec) / 1000.0 / 1000.0 / 1000.0 +
+			clk.tv_sec - last_clk.tv_sec;
+	}
 	last_clk = clk;
+	assert(glGetError() == GL_NO_ERROR);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -234,6 +239,28 @@ void keyb(unsigned char key, int x, int y)
 	switch(key) {
 	case 27:
 		exit(0);
+
+	case '{':
+			elapsed_sec -= 1.0;
+			break;
+	case '}':
+			elapsed_sec += 1.0;
+			break;
+	case '[':
+			elapsed_sec -= 0.10;
+			break;
+	case ']':
+			elapsed_sec += 0.10;
+			break;
+	case '<':
+			elapsed_sec -= 0.01;
+			break;
+	case '>':
+			elapsed_sec += 0.01;
+			break;
+	case 'p':
+			paused = !paused;
+			break;
 
 	case 's':
 			draw_to_texture();
@@ -571,19 +598,19 @@ void create_texture()
 
 void draw_to_texture()
 {
-        int orig_width = win_width, orig_height = win_height;
-  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-  glViewport(0, 0, CAPTURE_WIDTH, CAPTURE_HEIGHT);
-  reshape(CAPTURE_WIDTH, CAPTURE_HEIGHT);
+	int orig_width = win_width, orig_height = win_height;
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	reshape(CAPTURE_WIDTH, CAPTURE_HEIGHT);
+	assert(glGetError() == GL_NO_ERROR);
 
-  disp();
+	disp();
 
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  glReadBuffer(GL_FRONT);
-  glReadPixels(0, 0, CAPTURE_WIDTH, CAPTURE_HEIGHT, CAPTURE_FORMAT, GL_UNSIGNED_BYTE, capture_pixels);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glReadPixels(0, 0, CAPTURE_WIDTH, CAPTURE_HEIGHT, CAPTURE_FORMAT, GL_UNSIGNED_BYTE, capture_pixels);
+	assert(glGetError() == GL_NO_ERROR);
 
-  save_image();
+	save_image();
 
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  reshape(orig_width, orig_height);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	reshape(orig_width, orig_height);
 }

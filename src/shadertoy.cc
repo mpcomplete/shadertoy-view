@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <GL/glew.h>
 #include <iostream>
+#include <sys/time.h>
 
 #include "../lodepng/lodepng.h"
 
@@ -131,6 +132,12 @@ int main(int argc, char **argv)
 	LOADTEX("data/tex11.png");
 	LOADTEX("data/tex12.png");
 	LOADTEX("data/tex14.png");
+	LOADTEX("data/tex15.png");
+	LOADTEX("data/tex16.png");
+	LOADTEX("data/tex17.jpg");
+	LOADTEX("data/tex18.jpg");
+	LOADTEX("data/tex19.png");
+	LOADTEX("data/tex20.jpg");
 	assert(glGetError() == GL_NO_ERROR);
 #if 0
 	LOADCUBE("data/cube00_%d.jpg");
@@ -165,20 +172,30 @@ void disp()
 {
 	time_t tmsec = time(0);
 	struct tm *tm = localtime(&tmsec);
+	struct timespec clk;
+	clock_gettime(CLOCK_REALTIME, &clk);
+	static struct timespec last_clk = clk;
+	static double elapsed_sec = 0.0;
+	elapsed_sec += 0.015;
+		// (clk.tv_nsec - last_clk.tv_nsec) / 1000.0 / 1000.0 / 1000.0 +
+		// clk.tv_sec - last_clk.tv_sec;
+	last_clk = clk;
+	// struct timeval tv;
+	// gettimeofday(&tv, NULL);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	// assert(glGetError() == GL_NO_ERROR);
+	assert(glGetError() == GL_NO_ERROR);
 	glUseProgram(sdr);
-	// assert(glGetError() == GL_NO_ERROR);
+	assert(glGetError() == GL_NO_ERROR);
 
 	// set uniforms
 	glUniform2f(uloc.resolution, win_width, win_height);
-	glUniform1f(uloc.globaltime, glutGet(GLUT_ELAPSED_TIME) / 1000.0);
+	glUniform1f(uloc.globaltime, elapsed_sec);
 	glUniform4f(uloc.mouse, mouse_x, mouse_y, click_x, click_y);
 	glUniform4f(uloc.date, tm->tm_year, tm->tm_mon, tm->tm_mday,
 			tm->tm_sec + tm->tm_min * 60 + tm->tm_hour * 3600);
-	// assert(glGetError() == GL_NO_ERROR);
+	assert(glGetError() == GL_NO_ERROR);
 
 	int tunit = 0;
 	for(int i=0; i<4; i++) {
@@ -189,7 +206,7 @@ void disp()
 			tunit++;
 		}
 	}
-	// assert(glGetError() == GL_NO_ERROR);
+	assert(glGetError() == GL_NO_ERROR);
 
 	glBegin(GL_QUADS);
 	glVertex2f(-1, -1);
@@ -199,7 +216,7 @@ void disp()
 	glEnd();
 
 	glutSwapBuffers();
-	// assert(glGetError() == GL_NO_ERROR);
+	assert(glGetError() == GL_NO_ERROR);
 }
 
 void idle()
@@ -220,13 +237,9 @@ void keyb(unsigned char key, int x, int y)
 	case 27:
 		exit(0);
 
-        case 'i':
-                create_texture();
-                break;
-
-        case 's':
-                draw_to_texture();
-                break;
+	case 's':
+			draw_to_texture();
+			break;
 
 	case 'f':
 	case 'F':
@@ -296,7 +309,6 @@ unsigned int load_shader(const char *fname)
 	fclose(fp);
 
 	strcpy(&src[sz], extra);
-//	src[sz] = 0;
 
 	printf("compiling shader: %s\n", fname);
 	//printf("SOURCE: %s\n", src);

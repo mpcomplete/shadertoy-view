@@ -3,8 +3,8 @@ obj = $(src:.cc=.o) lodepng/lodepng.o
 dep = $(obj:.o=.d)
 bin = shadertoy
 
-CXXFLAGS = -pedantic -Wall -g
-LDFLAGS = $(libgl)
+CXXFLAGS = -pedantic -Wall -g -I../libimago/src
+LDFLAGS = $(libgl) ../libimago/libimago.a -ldl -lpng -ljpeg
 
 ifeq ($(shell uname -s), Darwin)
 	libgl = -framework OpenGL -framework GLUT -lGLEW

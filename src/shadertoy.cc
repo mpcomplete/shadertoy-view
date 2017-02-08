@@ -33,6 +33,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <GLUT/glut.h>
 #endif
 
+#include <imago2.h>
+
 struct Texture {
 	unsigned int id;
 	unsigned int targ;
@@ -48,8 +50,8 @@ void mouse(int bn, int state, int x, int y);
 void motion(int x, int y);
 unsigned int load_shader(const char *fname);
 bool load_shader_metadata(const char *sdrname);
-//Texture *load_texture(const char *fname);
-//Texture *load_cubemap(const char *fname_fmt);
+Texture *load_texture(const char *fname);
+Texture *load_cubemap(const char *fname_fmt);
 bool parse_args(int argc, char **argv);
 void create_texture();
 void draw_to_texture();
@@ -112,7 +114,7 @@ int main(int argc, char **argv)
 	glutMotionFunc(motion);
 
 	glewInit();
-#if 0
+
 	int dataidx = 0;
 
 	LOADTEX("data/tex00.jpg");
@@ -130,7 +132,7 @@ int main(int argc, char **argv)
 	LOADTEX("data/tex12.png");
 	LOADTEX("data/tex14.png");
 	assert(glGetError() == GL_NO_ERROR);
-
+#if 0
 	LOADCUBE("data/cube00_%d.jpg");
 	LOADCUBE("data/cube01_%d.png");
 	LOADCUBE("data/cube02_%d.jpg");
@@ -141,7 +143,7 @@ int main(int argc, char **argv)
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-        // create_texture();
+	create_texture();
 
 	load_shader_metadata(sdrfname_arg);
 
@@ -281,7 +283,8 @@ unsigned int load_shader(const char *fname)
 
 	int sz = filesz + strlen(header) + 32;
 
-	char *src = new char[sz + 1];
+	const char extra[] = "void main(){mainImage(gl_FragColor, gl_FragCoord.xy);}";
+	char *src = new char[sz + sizeof(extra) + 1];
 	memset(src, ' ', sz);
 	sprintf(src, header, activetex[0]->stype, activetex[1]->stype, activetex[2]->stype, activetex[3]->stype);
 
@@ -291,7 +294,9 @@ unsigned int load_shader(const char *fname)
 		return 0;
 	}
 	fclose(fp);
-	src[sz] = 0;
+
+	strcpy(&src[sz], extra);
+//	src[sz] = 0;
 
 	printf("compiling shader: %s\n", fname);
 	//printf("SOURCE: %s\n", src);
@@ -392,7 +397,6 @@ bool load_shader_metadata(const char *sdrname)
 	return true;
 }
 
-#if 0
 Texture *load_texture(const char *fname)
 {
 	Texture *tex = new Texture;
@@ -457,7 +461,6 @@ Texture *load_cubemap(const char *fname_fmt)
 
 	return tex;
 }
-#endif
 
 bool parse_args(int argc, char **argv)
 {

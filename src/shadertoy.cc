@@ -536,8 +536,9 @@ bool parse_args(int argc, char **argv)
 
 static GLubyte *capture_pixels = NULL;
 static GLuint framebuffer = 0;
-static const GLuint CAPTURE_WIDTH = 3840;
-static const GLuint CAPTURE_HEIGHT = 2160;
+static const GLuint DPI = 200;
+static const GLuint CAPTURE_WIDTH = DPI*36;
+static const GLuint CAPTURE_HEIGHT = DPI*24;
 static const GLenum CAPTURE_FORMAT = GL_RGBA;
 static const GLuint CAPTURE_FORMAT_NBYTES = 4;
 
@@ -568,6 +569,7 @@ void create_texture()
 
   // Give an empty image to OpenGL ( the last "0" )
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CAPTURE_WIDTH, CAPTURE_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+  assert(glGetError() == GL_NO_ERROR);
 
   // Poor filtering. Needed !
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

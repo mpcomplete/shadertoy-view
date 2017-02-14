@@ -547,11 +547,11 @@ static void save_image() {
   char filename[256];
   snprintf(filename, sizeof(filename), "screenshot%d.png", nscreenshots++);
 
-//   std::cout << "Capturing " << filename << "..." << std::flush;
+  std::cout << "Capturing " << filename << "..." << std::flush;
   std::vector<unsigned char> image_buf;
   lodepng::encode(image_buf, capture_pixels, CAPTURE_WIDTH, CAPTURE_HEIGHT);
   lodepng::save_file(image_buf, filename);
-//   std::cout << "done" << std::endl;
+  std::cout << "done" << std::endl;
 }
 
 void create_texture()

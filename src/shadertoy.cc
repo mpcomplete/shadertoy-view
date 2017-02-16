@@ -536,7 +536,7 @@ bool parse_args(int argc, char **argv)
 
 static GLubyte *capture_pixels = NULL;
 static GLuint framebuffer = 0;
-static const GLuint DPI = 200;
+static const GLuint DPI = 300;
 static const GLuint CAPTURE_WIDTH = DPI*36;
 static const GLuint CAPTURE_HEIGHT = DPI*24;
 static const GLenum CAPTURE_FORMAT = GL_RGBA;

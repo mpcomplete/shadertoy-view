@@ -2,6 +2,37 @@
 
 float time = iGlobalTime*.3;
 
+float _kCubicErrorBound = 0.001;
+
+float _evaluateCubic(float a, float b, float m) {
+return 3. * a * (1. - m) * (1. - m) * m +
+        3. * b * (1. - m) *           m * m +
+                                      m * m * m;
+}
+
+float _transformCubic(float t, float a, float b, float c, float d) {
+    float start = 0.0;
+    float end = 1.0;
+    while (true) {
+        float midpoint = (start + end) / 2.;
+        float estimate = _evaluateCubic(a, c, midpoint);
+        if (abs(t - estimate) < _kCubicErrorBound)
+            return _evaluateCubic(b, d, midpoint);
+        if (estimate < t)
+            start = midpoint;
+        else
+            end = midpoint;
+    }
+}
+
+float easeIn(float t) {
+    return _transformCubic(t, 0.42, 0.0, 1.0, 1.0);
+}
+
+float fastOutSlowIn(float t) {
+    return _transformCubic(t, 0.4, 0.0, 0.2, 1.0);
+}
+
 // 2D rotation matrix.
 mat2 rotate(float angle)
 {
@@ -75,7 +106,7 @@ vec2 applyTransform(in vec2 p)
     if (iMouse.z > .001) t = iMouse.x/iResolution.x * numPhases;
 #endif
     float pct = smoothstep(0., 1., mod(t, 1.));
-    return mix(getTransform(p, t), getTransform(p, t+1.), pct);
+    return mix(getTransform(p, t), getTransform(p, t+1.), fastOutSlowIn(pct));
 }
 
 vec4 gradient(float f)

@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutCreateWindow("ShaderToy viewer");
 
 	glutDisplayFunc(disp);
